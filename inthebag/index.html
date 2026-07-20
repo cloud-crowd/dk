@@ -3,25 +3,27 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>In The Bag — Game Runner</title>
+<title>In Da Bag — Game Runner</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --ink: #1E1B16;
-    --ink-soft: #2A2520;
-    --ink-softer: #342E27;
-    --canvas: #E4D9BE;
-    --canvas-dark: #C9B892;
-    --chalk: #FAF6EC;
-    --team-a: #B23A2E;
-    --team-a-soft: #E7C9C4;
-    --team-b: #2E5C73;
-    --team-b-soft: #C7D9E1;
-    --stitch: #8A7B57;
-    --line: rgba(250,246,236,0.14);
-    --good: #4C7A4A;
-    --warn: #C98A2E;
+    --ink: #0B0B14;
+    --ink-soft: #17151F;
+    --ink-softer: #1E1B2C;
+    --canvas: #F5F5FF;
+    --canvas-dark: #9C9CC7;
+    --chalk: #F5F5FF;
+    --team-a: #FF2E6C;
+    --team-a-soft: #4A1230;
+    --team-b: #00E5FF;
+    --team-b-soft: #0A3A42;
+    --stitch: #4E4A78;
+    --line: rgba(245,245,255,0.14);
+    --good: #17B978;
+    --warn: #FFB300;
+    --danger: #FF3B3B;
+    --accent: #FFEA00;
   }
 
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -47,41 +49,43 @@
 
   .app { width: 100%; max-width: 540px; display: flex; flex-direction: column; min-height: calc(100vh - 28px); }
 
-  .view { display: none; flex-direction: column; flex: 1; animation: fadeIn 0.2s ease; }
-  .view.active { display: flex; }
-  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @media (min-width: 700px) {
+    .app { max-width: 640px; }
+  }
 
-  header.top {
+  /* ---------- Persistent top bar ---------- */
+  .app-topbar {
     display: flex;
-    align-items: baseline;
+    align-items: center;
     justify-content: space-between;
     gap: 12px;
     margin-bottom: clamp(16px, 3vw, 24px);
     padding-bottom: 12px;
     border-bottom: 2px dashed var(--stitch);
   }
-  .brand { display: flex; flex-direction: column; gap: 2px; }
-  .brand .eyebrow { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--canvas-dark); }
-  .brand h1 { font-family: 'Anton', sans-serif; font-weight: 400; font-size: clamp(24px, 6vw, 32px); letter-spacing: 0.02em; margin: 0; text-transform: uppercase; }
-  .brand h1 span { color: var(--canvas-dark); }
+  .brand-mini { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .brand-mini .eyebrow { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--canvas-dark); }
+  .brand-mini h1 { font-family: 'Anton', sans-serif; font-weight: 400; font-size: clamp(22px, 5.5vw, 30px); letter-spacing: 0.02em; margin: 0; text-transform: uppercase; }
+  .brand-mini h1 span { color: var(--accent); }
 
   .icon-btn {
     font-family: 'IBM Plex Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 0.05em;
+    font-size: 12px;
+    letter-spacing: 0.04em;
     text-transform: uppercase;
     background: transparent;
     color: var(--canvas-dark);
     border: 1px solid var(--stitch);
-    border-radius: 3px;
-    padding: 7px 11px;
+    border-radius: 6px;
+    padding: 9px 14px;
     cursor: pointer;
     white-space: nowrap;
+    flex-shrink: 0;
   }
   .icon-btn:hover { background: var(--ink-soft); color: var(--chalk); }
   .icon-btn:focus-visible { outline: 2px solid var(--canvas); outline-offset: 2px; }
 
-  h2.section-label {
+  h2.section-label, h3.section-label {
     font-family: 'IBM Plex Mono', monospace;
     font-size: 11px;
     letter-spacing: 0.18em;
@@ -90,80 +94,53 @@
     margin: 0 0 10px;
   }
 
-  /* ---------- Setup view ---------- */
-  .team-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 22px; }
-  .team-input-card { background: var(--ink-soft); border-radius: 10px; padding: 14px; border-top: 4px solid var(--team-color); }
+  .view { display: none; flex-direction: column; flex: 1; animation: fadeIn 0.2s ease; }
+  .view.active { display: flex; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  /* ---------- Setup (streamlined) view ---------- */
+  .team-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 18px; }
+  .team-input-card { background: var(--ink-soft); border-radius: 10px; padding: 14px; border-top: 4px solid var(--team-color); min-width: 0; }
   .team-input-card.a { --team-color: var(--team-a); }
   .team-input-card.b { --team-color: var(--team-b); }
   .team-input-card label { display: block; font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--team-color); margin-bottom: 6px; }
   .team-input-card input {
     width: 100%; background: transparent; border: none; border-bottom: 1px solid var(--line);
-    color: var(--chalk); font-family: 'Inter', sans-serif; font-weight: 600; font-size: 16px; padding: 4px 0;
+    color: var(--chalk); font-family: 'Inter', sans-serif; font-weight: 600; font-size: clamp(13px, 4vw, 16px); padding: 4px 0;
+    min-width: 0;
   }
   .team-input-card input:focus { outline: none; border-bottom-color: var(--team-color); }
+  .char-count { font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: var(--stitch); margin-top: 4px; text-align: right; }
 
-  .bag-card {
-    background: var(--canvas); color: var(--ink); border-radius: 10px; padding: 18px;
-    margin-bottom: 22px; border: 1.5px dashed var(--stitch);
+  .current-set-card {
+    background: var(--canvas); color: var(--ink); border-radius: 10px; padding: 14px 16px;
+    margin-bottom: 20px; border: 1.5px dashed var(--stitch);
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
   }
-  .bag-card .bag-count { font-family: 'Anton', sans-serif; font-size: 40px; line-height: 1; margin-bottom: 2px; }
-  .bag-card .bag-count .of { font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; color: var(--stitch); margin-left: 6px; }
-  .bag-card p { margin: 6px 0 14px; font-size: 13px; color: var(--ink-soft); line-height: 1.5; }
+  .current-set-card .set-info { display: flex; align-items: center; gap: 10px; min-width: 0; }
+  .current-set-card .set-emoji-lg { font-size: 26px; flex-shrink: 0; }
+  .current-set-card .set-info-text { min-width: 0; }
+  .current-set-card .set-label-eyebrow { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--stitch); }
+  .current-set-card .set-label-name { font-family: 'Anton', sans-serif; font-size: 18px; text-transform: uppercase; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-  .set-hint { font-size: 13px; color: var(--canvas-dark); line-height: 1.5; margin: 0 0 14px; }
-
-  .set-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-bottom: 22px;
-  }
-
-  .set-card {
-    background: var(--ink-soft);
-    border: 1.5px solid var(--stitch);
-    border-radius: 10px;
-    padding: 12px 12px;
-    text-align: left;
-    cursor: pointer;
-    color: var(--chalk);
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
-  .set-card .set-emoji { font-size: 20px; line-height: 1; }
-  .set-card .set-name { font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; letter-spacing: 0.02em; }
-  .set-card .set-count { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--canvas-dark); letter-spacing: 0.06em; text-transform: uppercase; }
-  .set-card:hover { border-color: var(--canvas-dark); }
-  .set-card:focus-visible { outline: 2px solid var(--canvas); outline-offset: 2px; }
-  .set-card.selected {
-    background: var(--canvas-dark);
-    color: var(--ink);
-    border-color: var(--canvas-dark);
-  }
-  .set-card.selected .set-count { color: var(--ink-soft); }
-
-  .rules-card {
-    background: var(--ink-soft); border-radius: 10px; padding: 16px 18px; margin-bottom: 22px;
-  }
-  .rules-card ol { margin: 0; padding-left: 18px; font-size: 13px; line-height: 1.7; color: var(--chalk); }
-  .rules-card ol li b { color: var(--canvas-dark); }
+  .spacer { flex: 1; }
 
   button.primary {
     font-family: 'Anton', sans-serif;
     font-size: clamp(18px, 4vw, 22px);
     letter-spacing: 0.02em;
     text-transform: uppercase;
-    background: var(--canvas-dark);
+    background: var(--accent);
     color: var(--ink);
     border: none;
     border-radius: 10px;
     padding: 16px;
     cursor: pointer;
     width: 100%;
-    transition: transform 0.08s ease, background 0.15s ease;
+    box-shadow: 0 0 0 rgba(255,234,0,0);
+    transition: transform 0.08s ease, background 0.15s ease, box-shadow 0.15s ease;
   }
-  button.primary:hover { background: var(--canvas); }
+  button.primary:hover { background: var(--canvas); box-shadow: 0 0 22px rgba(255,234,0,0.55); }
   button.primary:active { transform: scale(0.98); }
   button.primary:focus-visible { outline: 2px solid var(--chalk); outline-offset: 3px; }
   button.primary:disabled { opacity: 0.4; cursor: not-allowed; }
@@ -184,10 +161,92 @@
   button.secondary:hover { background: var(--ink-soft); }
   button.secondary:disabled { opacity: 0.35; cursor: not-allowed; }
 
-  .spacer { flex: 1; }
+  button.danger {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    background: transparent;
+    color: #FF9B9B;
+    border: 1.5px solid var(--danger);
+    border-radius: 8px;
+    padding: 11px;
+    cursor: pointer;
+    width: 100%;
+  }
+  button.danger:hover { background: rgba(255,59,59,0.15); }
 
-  /* ---------- Get-ready view ---------- */
-  .ready-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 18px; }
+  footer.credit {
+    text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--stitch); padding-top: 14px; letter-spacing: 0.05em;
+  }
+
+  /* ---------- Menu overlay ---------- */
+  .menu-overlay {
+    position: fixed; inset: 0; background: rgba(10,9,7,0.72);
+    display: none; justify-content: flex-end; z-index: 500;
+  }
+  .menu-overlay.open { display: flex; }
+  .menu-panel {
+    background: var(--ink); width: min(400px, 92vw); height: 100%;
+    padding: 18px; overflow-y: auto; border-left: 2px dashed var(--stitch);
+    display: flex; flex-direction: column;
+  }
+  .menu-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+  .menu-header h2 { font-family: 'Anton', sans-serif; font-size: 24px; text-transform: uppercase; margin: 0; }
+  .menu-scroll { flex: 1; }
+
+  .set-hint { font-size: 13px; color: var(--canvas-dark); line-height: 1.5; margin: 0 0 14px; }
+
+  .set-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+  @media (min-width: 480px) {
+    .set-grid { grid-template-columns: 1fr 1fr 1fr; }
+  }
+
+  .set-card {
+    background: var(--ink-soft);
+    border: 1.5px solid var(--stitch);
+    border-radius: 10px;
+    padding: 12px;
+    text-align: left;
+    cursor: pointer;
+    color: var(--chalk);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .set-card .set-emoji { font-size: 20px; line-height: 1; }
+  .set-card .set-name { font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; letter-spacing: 0.02em; }
+  .set-card .set-count { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--canvas-dark); letter-spacing: 0.06em; text-transform: uppercase; }
+  .set-card:hover { border-color: var(--accent); }
+  .set-card:focus-visible { outline: 2px solid var(--canvas); outline-offset: 2px; }
+  .set-card.selected { background: var(--accent); color: var(--ink); border-color: var(--accent); }
+  .set-card.selected .set-count { color: var(--ink-soft); }
+
+  .rules-card {
+    background: var(--ink-soft); border-radius: 10px; padding: 16px 18px; margin-bottom: 24px;
+  }
+  .rules-card ol { margin: 0; padding-left: 18px; font-size: 13px; line-height: 1.7; color: var(--chalk); }
+  .rules-card ol li b { color: var(--accent); }
+
+  .admin-card { background: var(--ink-soft); border-radius: 10px; padding: 16px; margin-bottom: 10px; }
+  .admin-note { font-size: 12px; color: var(--canvas-dark); line-height: 1.5; margin: 0 0 14px; }
+  .admin-score-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 6px; align-items: center; }
+  .admin-score-grid .admin-head { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--canvas-dark); text-align: center; text-transform: uppercase; }
+  .admin-score-grid .admin-team-label { font-family: 'Inter', sans-serif; font-weight: 700; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .admin-score-grid input[type="number"] {
+    width: 100%; text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 14px;
+    background: var(--ink); color: var(--chalk); border: 1px solid var(--line); border-radius: 6px; padding: 6px 2px;
+  }
+  .admin-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 14px; }
+  .admin-status { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--good); min-height: 14px; margin-top: 8px; text-align: center; }
+
+  /* ---------- Ready view ---------- */
+  .ready-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 18px; padding: 0 4px; }
   .round-pill {
     font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
     background: var(--ink-soft); border: 1.5px dashed var(--stitch); border-radius: 999px; padding: 6px 16px; color: var(--canvas-dark);
@@ -198,42 +257,36 @@
     font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink);
     padding: 4px 12px; border-radius: 999px; background: var(--team-color); margin-bottom: -4px;
   }
-  .next-team-name { font-family: 'Anton', sans-serif; font-size: clamp(30px, 8vw, 42px); color: var(--team-color); text-transform: uppercase; margin: 0; }
+  .next-team-name {
+    font-family: 'Anton', sans-serif; font-size: clamp(20px, 6.5vw, 34px); color: var(--team-color); text-transform: uppercase; margin: 0;
+    word-break: break-word; overflow-wrap: anywhere; max-width: 100%; line-height: 1.15; text-shadow: 0 0 22px currentColor;
+  }
   .skip-note { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--canvas-dark); }
-  .ready-actions { width: 100%; max-width: 320px; }
+  .ready-actions { width: 100%; max-width: 320px; margin: 0 auto; }
 
   /* ---------- Play view ---------- */
-  .play-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-  .play-round-tag { font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--canvas-dark); }
-  .play-team-tag { font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; padding: 3px 10px; border-radius: 999px; color: var(--ink); background: var(--team-color); }
+  .play-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 8px; }
+  .play-round-tag { font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--canvas-dark); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .play-team-tag {
+    font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; padding: 3px 10px; border-radius: 999px; color: var(--ink); background: var(--team-color);
+    max-width: 55%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex-shrink: 0;
+  }
 
   .bag-progress-track { height: 8px; border-radius: 999px; background: var(--ink-soft); overflow: hidden; margin-bottom: 18px; border: 1px solid var(--line); }
-  .bag-progress-fill { height: 100%; background: var(--canvas-dark); border-radius: 999px; transition: width 0.3s ease; }
+  .bag-progress-fill { height: 100%; background: var(--accent); border-radius: 999px; transition: width 0.3s ease; box-shadow: 0 0 10px rgba(255,234,0,0.5); }
 
   .timer-ring-wrap { display: flex; justify-content: center; margin-bottom: 16px; position: relative; }
-  .timer-num {
-    font-family: 'Anton', sans-serif; font-size: clamp(56px, 16vw, 84px); line-height: 1; color: var(--chalk);
-  }
+  .timer-num { font-family: 'Anton', sans-serif; font-size: clamp(56px, 16vw, 84px); line-height: 1; color: var(--chalk); }
   .timer-num.low { color: var(--warn); }
-  .timer-num.critical { color: var(--team-a); animation: pulse 0.5s ease infinite alternate; }
+  .timer-num.critical { color: var(--team-a); animation: pulse 0.5s ease infinite alternate; text-shadow: 0 0 18px var(--team-a); }
   @keyframes pulse { from { opacity: 1; } to { opacity: 0.5; } }
 
   .word-card {
-    flex: 1;
-    min-height: 160px;
-    background: var(--canvas);
-    color: var(--ink);
-    border-radius: 14px;
-    border: 2px dashed var(--stitch);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 24px 16px;
-    margin-bottom: 18px;
+    flex: 1; min-height: 160px; background: var(--canvas); color: var(--ink); border-radius: 14px;
+    border: 2px dashed var(--stitch); display: flex; align-items: center; justify-content: center;
+    text-align: center; padding: 24px 16px; margin-bottom: 18px;
   }
-  .word-card .word-text { font-family: 'Anton', sans-serif; font-size: clamp(30px, 9vw, 46px); text-transform: uppercase; line-height: 1.1; }
-  .word-card.hidden-word .word-text { color: var(--stitch); font-family: 'IBM Plex Mono', monospace; font-size: 16px; text-transform: none; letter-spacing: 0.04em; }
+  .word-card .word-text { font-family: 'Anton', sans-serif; font-size: clamp(28px, 8.5vw, 46px); text-transform: uppercase; line-height: 1.1; word-break: break-word; }
 
   .play-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
   button.got-it {
@@ -252,45 +305,39 @@
   .timer-controls { display: flex; gap: 10px; }
   .timer-controls button { flex: 1; }
 
-  /* ---------- Time's up / round / game end views ---------- */
+  /* ---------- Result views ---------- */
   .result-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 16px; }
-  .result-headline { font-family: 'Anton', sans-serif; font-size: clamp(28px, 8vw, 40px); text-transform: uppercase; margin: 0; }
-  .result-sub { font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: var(--canvas-dark); }
+  .result-headline { font-family: 'Anton', sans-serif; font-size: clamp(26px, 7.5vw, 40px); text-transform: uppercase; margin: 0; word-break: break-word; }
+  .result-sub { font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: var(--canvas-dark); word-break: break-word; }
 
-  .score-table { width: 100%; max-width: 380px; background: var(--ink-soft); border-radius: 10px; padding: 16px; }
-  .score-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--line); }
+  .score-table { width: 100%; max-width: 420px; background: var(--ink-soft); border-radius: 10px; padding: 16px; }
+  .score-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--line); gap: 10px; }
   .score-row:last-child { border-bottom: none; }
-  .score-row .team-tag-sm { font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; padding: 3px 8px; border-radius: 999px; color: var(--ink); }
-  .score-row .num { font-family: 'Anton', sans-serif; font-size: 22px; }
+  .score-row .team-tag-sm {
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; padding: 3px 8px; border-radius: 999px; color: var(--ink);
+    max-width: 65%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .score-row .num { font-family: 'Anton', sans-serif; font-size: 22px; flex-shrink: 0; }
 
   table.bt-table { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mono', monospace; }
   table.bt-table th, table.bt-table td { padding: 8px 4px; text-align: center; }
   table.bt-table th { color: var(--canvas-dark); font-weight: 600; text-transform: uppercase; font-size: 9px; letter-spacing: 0.06em; border-bottom: 1px solid var(--stitch); }
-  table.bt-table td.team-cell { text-align: left; font-family: 'Inter', sans-serif; font-weight: 700; font-size: 13px; }
+  table.bt-table td.team-cell { text-align: left; font-family: 'Inter', sans-serif; font-weight: 700; font-size: 13px; max-width: 110px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   table.bt-table td { font-size: 13px; }
-  table.bt-table tr.total-row td { font-family: 'Anton', sans-serif; font-size: 17px; border-top: 1px solid var(--line); padding-top: 12px; }
-  table.bt-table tr.tie-row td { color: var(--warn); }
 
   .final-banner {
-    background: var(--canvas); color: var(--ink); border-radius: 12px; padding: 20px; border: 2px dashed var(--stitch);
-    font-family: 'Anton', sans-serif; font-size: clamp(22px, 6vw, 30px); text-transform: uppercase; width: 100%; max-width: 400px;
+    background: var(--canvas); color: var(--ink); border-radius: 12px; padding: 18px; border: 2px dashed var(--stitch);
+    font-family: 'Anton', sans-serif; font-size: clamp(18px, 5.5vw, 28px); text-transform: uppercase; width: 100%; max-width: 420px; word-break: break-word;
   }
 
-  .result-actions { width: 100%; max-width: 320px; display: flex; flex-direction: column; gap: 10px; }
+  .result-actions { width: 100%; max-width: 320px; margin: 0 auto; display: flex; flex-direction: column; gap: 10px; }
 
-  /* flash overlay for time's up alert */
-  #flashOverlay {
-    position: fixed; inset: 0; background: var(--team-a); opacity: 0; pointer-events: none; z-index: 999;
-  }
+  #flashOverlay { position: fixed; inset: 0; background: var(--team-a); opacity: 0; pointer-events: none; z-index: 999; }
   #flashOverlay.flashing { animation: flashAnim 0.9s ease-in-out 2; }
   @keyframes flashAnim { 0%, 100% { opacity: 0; } 50% { opacity: 0.55; } }
 
   @media (prefers-reduced-motion: reduce) {
     * { animation: none !important; transition: none !important; }
-  }
-
-  footer.credit {
-    text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--stitch); padding-top: 14px; letter-spacing: 0.05em;
   }
 </style>
 </head>
@@ -300,43 +347,39 @@
 
 <div class="app">
 
-  <!-- ============ SETUP VIEW ============ -->
-  <section class="view active" id="view-setup">
-    <header class="top">
-      <div class="brand"><span class="eyebrow">Bag Toss &amp; Word Game</span><h1>In The <span>Bag</span></h1></div>
-    </header>
+  <div class="app-topbar">
+    <div class="brand-mini"><h1>In Da <span>Bag</span></h1></div>
+    <button class="icon-btn" id="menuBtn" type="button">☰ Menu</button>
+  </div>
 
+  <!-- ============ SETUP VIEW (streamlined) ============ -->
+  <section class="view active" id="view-setup">
     <h2 class="section-label">Teams</h2>
     <div class="team-inputs">
       <div class="team-input-card a">
         <label for="nameA">Team A</label>
-        <input id="nameA" maxlength="16" value="Team A" aria-label="Team A name">
+        <input id="nameA" maxlength="20" value="Team A" aria-label="Team A name">
       </div>
       <div class="team-input-card b">
         <label for="nameB">Team B</label>
-        <input id="nameB" maxlength="16" value="Team B" aria-label="Team B name">
+        <input id="nameB" maxlength="20" value="Team B" aria-label="Team B name">
       </div>
     </div>
 
-    <h2 class="section-label">Choose a word set</h2>
-    <p class="set-hint">Each set has 50 words, reused across all three rounds. Pick a new one any time — including after a game, to play again with fresh words.</p>
-    <div class="set-grid" id="setGrid"></div>
-
-    <h2 class="section-label">How it works</h2>
-    <div class="rules-card">
-      <ol>
-        <li><b>Round 1 — Describe it:</b> say anything except the word itself. No actions.</li>
-        <li><b>Round 2 — One word only:</b> a single word clue, nothing more.</li>
-        <li><b>Round 3 — Act it out:</b> no talking or sounds, gestures only.</li>
-        <li>30 seconds per turn. Pass the phone to the next player when it's your team's turn.</li>
-        <li>One skip per team, per round.</li>
-        <li>Tied after 3 rounds? Sudden death: one 30-second Act It Out turn each, no skips, most words guessed wins.</li>
-      </ol>
+    <div class="current-set-card">
+      <div class="set-info">
+        <span class="set-emoji-lg" id="currentSetEmoji">🎒</span>
+        <div class="set-info-text">
+          <div class="set-label-eyebrow">Playing</div>
+          <div class="set-label-name" id="currentSetName">Grab Bag</div>
+        </div>
+      </div>
+      <button class="icon-btn" id="changeSetBtn" type="button">Change</button>
     </div>
 
     <div class="spacer"></div>
     <button class="primary" id="startGameBtn" type="button">Start Game</button>
-    <footer class="credit">In The Bag · Game Runner</footer>
+    <footer class="credit">In Da Bag · Game Runner</footer>
   </section>
 
   <!-- ============ GET READY VIEW ============ -->
@@ -417,83 +460,212 @@
 
 </div>
 
+<!-- ============ MENU OVERLAY ============ -->
+<div class="menu-overlay" id="menuOverlay">
+  <div class="menu-panel">
+    <div class="menu-header">
+      <h2>Menu</h2>
+      <button class="icon-btn" id="closeMenuBtn" type="button">✕ Close</button>
+    </div>
+    <div class="menu-scroll">
+      <h3 class="section-label">Word set</h3>
+      <p class="set-hint">Each set has 50 words, reused across all three rounds. Changes apply the next time you hit Start Game.</p>
+      <div class="set-grid" id="setGrid"></div>
+
+      <h3 class="section-label">How it works</h3>
+      <div class="rules-card">
+        <ol>
+          <li><b>Round 1 — Describe it:</b> say anything except the word itself. No actions.</li>
+          <li><b>Round 2 — One word only:</b> a single word clue, nothing more.</li>
+          <li><b>Round 3 — Act it out:</b> no talking or sounds, gestures only.</li>
+          <li>30 seconds per turn. Pass the phone to the next player when it's your team's turn.</li>
+          <li>One skip per team, per round.</li>
+          <li>Tied after 3 rounds? Sudden death: one 30-second Act It Out turn each, no skips, most words guessed wins.</li>
+        </ol>
+      </div>
+
+      <h3 class="section-label">Admin</h3>
+      <div class="admin-card">
+        <p class="admin-note">Rename either team any time — it updates everywhere immediately.</p>
+        <div class="team-inputs" style="margin-bottom:0;">
+          <div class="team-input-card a">
+            <label for="adminNameA">Team A</label>
+            <input id="adminNameA" maxlength="20" value="Team A" aria-label="Rename Team A">
+          </div>
+          <div class="team-input-card b">
+            <label for="adminNameB">Team B</label>
+            <input id="adminNameB" maxlength="20" value="Team B" aria-label="Rename Team B">
+          </div>
+        </div>
+      </div>
+
+      <div class="admin-card">
+        <p class="admin-note">Fix a miscount or check the current score. Scores save automatically and survive a page reload — the only way to clear them is the reset button below.</p>
+        <div id="adminScoreEditor"></div>
+        <div class="admin-actions">
+          <button class="secondary" id="saveScoresBtn" type="button">Save score changes</button>
+          <button class="danger" id="resetScoresBtn" type="button">Reset all scores</button>
+        </div>
+        <div class="admin-status" id="adminStatus"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 (function(){
   "use strict";
 
-  // ---------------- Word pool ----------------
-  const WORD_SETS = [
-    { id: "animal-kingdom", emoji: "🦒", name: "Animal Kingdom", words: [
+  // ---------------- Word category pools (used to build the "mixed" sets) ----------------
+  const CATEGORY_POOLS = {
+    animals: [
       "Kangaroo","Octopus","Penguin","Flamingo","Gorilla","Cheetah","Peacock","Sloth","Hedgehog","Camel",
       "Dolphin","Owl","Jellyfish","Chameleon","Platypus","Elephant","Giraffe","Zebra","Koala","Panda",
       "Otter","Raccoon","Squirrel","Beaver","Walrus","Toucan","Ostrich","Hippopotamus","Rhinoceros","Armadillo",
       "Porcupine","Anteater","Meerkat","Lemur","Iguana","Gecko","Seahorse","Starfish","Crab","Lobster",
       "Firefly","Ladybug","Dragonfly","Woodpecker","Hummingbird","Bat","Skunk","Moose","Bison","Snail"
-    ]},
-    { id: "around-the-house", emoji: "🏠", name: "Around the House", words: [
+    ],
+    house: [
       "Toaster","Umbrella","Flashlight","Backpack","Sunglasses","Trampoline","Bicycle","Telescope","Guitar","Piano",
       "Camera","Suitcase","Compass","Anchor","Chandelier","Birdcage","Hourglass","Kaleidoscope","Rocking chair","Vacuum cleaner",
       "Ironing board","Doormat","Alarm clock","Bathtub","Showerhead","Ceiling fan","Ladder","Toolbox","Flowerpot","Welcome mat",
       "Mailbox","Garden hose","Wheelbarrow","Clothesline","Laundry basket","Trash can","Broom","Dustpan","Mop","Refrigerator",
       "Microwave","Blender","Dishwasher","Bookshelf","Recliner","Nightstand","Curtains","Doorbell","Thermostat","Extension cord"
-    ]},
-    { id: "on-the-move", emoji: "🧭", name: "On The Move", words: [
+    ],
+    places: [
       "The beach","A haunted house","The North Pole","A desert island","A jungle","The moon","A castle","A submarine","A campfire","An amusement park",
       "A library","A volcano","A cave","A lighthouse","A farm","Airport","Train station","Subway","Cruise ship","Hot air balloon",
       "Helicopter","Sailboat","Canoe","Rollercoaster","Ferris wheel","Campground","Ski resort","Waterpark","Zoo","Aquarium",
       "Museum","Stadium","Concert hall","Border crossing","Road trip","Traffic jam","Rest stop","Hotel lobby","Passport control","Luggage carousel",
       "Tour bus","Hiking trail","Mountain summit","Rainforest canopy","Coral reef","Desert oasis","Ice cave","Ancient ruins","Space station","Time machine"
-    ]},
-    { id: "silver-screen-nights", emoji: "🎬", name: "Silver Screen Nights", words: [
+    ],
+    screen: [
       "A pirate","A ninja","A superhero","A wizard","A vampire","A robot","A mermaid","An astronaut","A cowboy","A ballerina",
       "A clown","A detective","A knight","A magician","A movie star","A stunt double","A film director","A red carpet","A plot twist","A cliffhanger",
       "A sequel","A villain","A sidekick","A love story","A car chase","A musical number","A haunted mansion","A secret identity","A time loop","A courtroom drama",
       "A talent show","A karaoke night","A stand-up comedian","A silent film","A film premiere","A movie trailer","A popcorn bucket","A 3D movie","A drive-in theater","A soundtrack",
       "A cameo appearance","A plot hole","A spin-off","A remake","A blooper reel","A box office hit","A tearjerker","A movie poster","A movie marathon","An award acceptance speech"
-    ]},
-    { id: "food-and-feasts", emoji: "🌮", name: "Food & Feasts", words: [
+    ],
+    food: [
       "Popcorn","Spaghetti","Pineapple","Ice cream cone","Hot dog","Watermelon","Pancakes","Birthday cake","Marshmallow","Taco",
       "Sushi","Bubblegum","Lemonade","Cotton candy","Pretzel","Pizza slice","Burrito","Donut","Waffle","Milkshake",
       "Nachos","Grilled cheese","French fries","Cupcake","Gingerbread man","S'mores","Fruit salad","Smoothie","Corn on the cob","Barbecue ribs",
       "Chocolate fondue","Peanut butter sandwich","Omelet","Pasta salad","Popsicle","Root beer float","Trail mix","Deviled eggs","Pumpkin pie","Apple cider",
       "Hot chocolate","Candy cane","Egg roll","Dumplings","Ramen","Bagel with cream cheese","Avocado toast","Fruit smoothie bowl","Churro","Birthday candles"
-    ]},
-    { id: "wild-weather-nature", emoji: "🌪️", name: "Wild Weather & Nature", words: [
+    ],
+    weather: [
       "Thunderstorm","Rainbow","Avalanche","Tornado","Snowflake","Earthquake","Sunrise","Waterfall","Northern lights","Quicksand",
       "Blizzard","Hurricane","Sandstorm","Heatwave","Fog","Frost","Hailstorm","Lightning bolt","Rip current","Tidal wave",
       "Drought","Wildfire","Landslide","Geyser","Glacier","Volcano eruption","Meteor shower","Solar eclipse","Lunar eclipse","Full moon",
       "Shooting star","Dew drop","Morning mist","Autumn leaves","Spring bloom","Summer breeze","Winter frost","Monsoon season","Desert mirage","Coral bleaching",
       "Migrating birds","Hibernating bear","Molting snake","Spider web","Beehive","Anthill","Falling leaves","Melting icicle","Cracked riverbed","Puddle jumping"
-    ]},
-    { id: "action-stations", emoji: "🤸", name: "Action Stations", words: [
+    ],
+    actions: [
       "Juggling","Sleepwalking","Sneezing","Snoring","Whistling","Hiccupping","Skateboarding","Surfing","Bowling","Fishing",
       "Tightrope walking","Milking a cow","Riding a rollercoaster","Building a sandcastle","Blowing bubbles","Flying a kite","Taking a selfie","Doing the laundry","Brushing teeth","Tying shoelaces",
       "Jumping rope","Climbing a tree","Baking a cake","Painting a fence","Mowing the lawn","Washing dishes","Ironing clothes","Vacuuming the carpet","Watering plants","Walking a dog",
       "Riding a horse","Playing tug of war","Building a snowman","Making a paper airplane","Popping bubble wrap","Cracking an egg","Peeling a banana","Threading a needle","Rowing a boat","Climbing a ladder",
       "Balancing on one foot","Doing a cartwheel","Yodeling","Break dancing","Moonwalking","Hula dancing","Arm wrestling","Thumb wrestling","Playing charades","Doing a magic trick"
-    ]},
-    { id: "occupations-oddballs", emoji: "🕵️", name: "Occupations & Oddballs", words: [
+    ],
+    people: [
       "A firefighter","A chef","A detective","A referee","A lifeguard","A DJ","A yoga instructor","A dentist","A librarian","A tour guide",
       "A flight attendant","A construction worker","A veterinarian","A postal worker","A tailor","A blacksmith","A beekeeper","A lumberjack","A window washer","A garbage collector",
       "A crossing guard","A snake charmer","A fortune teller","A puppeteer","A street performer","A bodyguard","A tightrope walker","A circus ringmaster","A sword swallower","A fire eater",
       "A sculptor","A potter","A weaver","A locksmith","A watchmaker","A perfumer","A cartographer","An astronomer","An archaeologist","A paleontologist",
       "Albert Einstein","William Shakespeare","Abraham Lincoln","Cleopatra","Leonardo da Vinci","Amelia Earhart","Santa Claus","The Tooth Fairy","A snowman","A scarecrow"
-    ]},
-    { id: "sports-and-games", emoji: "🏆", name: "Sports & Games", words: [
+    ],
+    sports: [
       "Tug of war","Hopscotch","Dodgeball","Chess","Arm wrestling","Hula hoop","Frisbee","Musical chairs","Hide and seek","Leapfrog",
       "Basketball","Soccer","Baseball","Tennis","Golf","Bowling alley","Ping pong","Volleyball","Badminton","Archery",
       "Fencing","Rock climbing","Surfing competition","Ice skating","Figure skating","Snowboarding","Skiing","Sledding","Curling","Rowing race",
       "Swim meet","Relay race","Long jump","High jump","Pole vault","Gymnastics routine","Cheerleading","Marching band","Tailgate party","Football huddle",
       "Home run","Slam dunk","Hole in one","Checkmate","Board game night","Card game","Jigsaw puzzle","Scavenger hunt","Trivia night","Karaoke contest"
-    ]},
-    { id: "everyday-life-feelings", emoji: "☕", name: "Everyday Life & Feelings", words: [
+    ],
+    everyday: [
       "Writer's block","Stage fright","Déjà vu","Small talk","Road rage","Bed head","Jet lag","Sibling rivalry","Peer pressure","First impression",
       "Morning alarm","Monday blues","Coffee break","Awkward silence","Group project","Waiting room","Traffic light","Grocery list","Parking ticket","Spring cleaning",
       "Lost keys","Wrong number","Butterflies in your stomach","Cold feet","Getting goosebumps","Losing your train of thought","A gut feeling","Sweet tooth","Green with envy","Tongue-tied",
       "On thin ice","Walking on eggshells","Under the weather","Burning the midnight oil","Costing an arm and a leg","Piece of cake","Raining cats and dogs","Spilling the beans","Breaking the ice","Letting the cat out of the bag",
       "Hitting the hay","Cutting corners","Once in a blue moon","Barking up the wrong tree","Beating around the bush","A blessing in disguise","Jumping on the bandwagon","Playing it by ear","The last straw","Time flies"
-    ]}
+    ]
+  };
+
+  const CATEGORY_ORDER = ["animals","house","places","screen","food","weather","actions","people","sports","everyday"];
+
+  // Build 7 broad, unpredictable "mixed" sets by drawing 5 words from each of the
+  // 10 categories at a rotating offset — so no single set leans toward one topic.
+  function buildMixedWords(offset){
+    const words = [];
+    CATEGORY_ORDER.forEach(key => {
+      const pool = CATEGORY_POOLS[key];
+      for(let i = 0; i < 5; i++){
+        words.push(pool[(offset + i) % pool.length]);
+      }
+    });
+    return words;
+  }
+
+  const MIXED_SET_META = [
+    { name: "Grab Bag", emoji: "🎒" },
+    { name: "Wild Card Mix", emoji: "🃏" },
+    { name: "Curveball Combo", emoji: "🌀" },
+    { name: "Anything Goes", emoji: "🎲" },
+    { name: "Surprise Sack", emoji: "🎁" },
+    { name: "Random Roundup", emoji: "🤹" },
+    { name: "Potluck Pack", emoji: "🍿" }
   ];
+
+  const MIXED_SETS = MIXED_SET_META.map((meta, i) => ({
+    id: "mixed-" + (i + 1),
+    emoji: meta.emoji,
+    name: meta.name,
+    words: buildMixedWords(i * 5)
+  }));
+
+  const HAWAII_POOLS = {
+    food: [
+      "Poke","Spam musubi","Loco moco","Malasada","Shave ice","Laulau","Poi","Kalua pig","Lomi lomi salmon","Huli huli chicken",
+      "Saimin","Manapua","Li hing mui","Crack seed","Mochi","Haupia","Andagi","Bento box","Plate lunch","Katsu curry",
+      "Chicken katsu","Garlic shrimp","Acai bowl","Spam and eggs","Furikake rice","Shoyu chicken","Teri beef","Char siu","Poke bowl","Guava juice",
+      "POG juice","Lilikoi","Star fruit","Mango","Breadfruit (ulu)","Taro","Coconut","Pineapple","Banana bread","Kona coffee",
+      "Macadamia nut","Dried aku","Somen salad","Musubi","Bibimbap","Mochiko chicken","Tako poke","Ahi tataki","Spam katsu","Kalbi ribs"
+    ],
+    pidgin: [
+      "Da kine","Hammajang","Chicken skin","Talk stink","Small kine","Broke da mouth","Grinds","Choke (a lot)","Mo bettah","Rajah dat",
+      "Geev up","Stink eye","Cockaroach","Buggah","Pau hana","Shibai","Cherreh","Hana hou","Howzit","No can",
+      "Funny kine","Akamai","Kolohe","Lolo","Opala","Huhu","Kapakahi","Pupule","Kine","Hanabata days",
+      "Tita","Talk story","Shaka sign","Hang loose","Aloha spirit","Mahalo","E komo mai","Ono","Bumbye","Chance um",
+      "Fo real kine","Junk (bad)","Rubbah slippah","Auntie","Uncle","Braddah","Sistah","Da buggah stay broke","Move um","Chee hoo!"
+    ],
+    culture: [
+      "Shave ice stand","Plate lunch spot","Hula halau","Luau","Lei making","Outrigger canoe","Surfboard","Slack key guitar","Ukulele","Tiki torch",
+      "Plumeria lei","Hula skirt","Coconut bra","Grass skirt","Tsunami siren","Black sand beach","Rubber slippers","Beach towel","Boogie board","Spearfishing",
+      "Throw net fishing","Taro patch","Fish pond","Heiau","Petroglyphs","Volcano goddess Pele","King Kamehameha","Queen Liliʻuokalani","Duke Kahanamoku","A paniolo",
+      "A kumu hula","A lifeguard tower","A food truck","Wayfinding canoe","Humpback whale","Honu (sea turtle)","Monk seal","Red dirt shirt","Trade winds","Vog",
+      "King tide","Merrie Monarch Festival","May Day lei","Graduation lei","First day of school shave ice","Aloha Friday","Backyard potluck","Beach park camping","Bon dance","Obon festival lantern"
+    ]
+  };
+
+  // Same idea as the mixed sets above, but built from Hawaii-flavored pools: each of
+  // the 3 sets below draws a slice of food + pidgin + culture words so no single set
+  // leans toward one narrow topic.
+  function chunk3(pool){
+    return [pool.slice(0, 17), pool.slice(17, 34), pool.slice(34, 50)];
+  }
+  const foodChunks = chunk3(HAWAII_POOLS.food);
+  const pidginChunks = chunk3(HAWAII_POOLS.pidgin);
+  const cultureChunks = chunk3(HAWAII_POOLS.culture);
+
+  const HAWAII_SETS = [
+    { id: "hawaii-grab-bag", emoji: "🌺", name: "Hawaiʻi Grab Bag",
+      words: foodChunks[0].concat(pidginChunks[2]).concat(cultureChunks[1]) },
+    { id: "local-kine-mix", emoji: "🤙", name: "Local Kine Mix",
+      words: foodChunks[1].concat(pidginChunks[0]).concat(cultureChunks[2]) },
+    { id: "island-curveball", emoji: "🍍", name: "Island Curveball",
+      words: foodChunks[2].concat(pidginChunks[1]).concat(cultureChunks[0]) }
+  ];
+
+  const WORD_SETS = MIXED_SETS.concat(HAWAII_SETS);
 
   function getSetWords(id){
     const set = WORD_SETS.find(s => s.id === id) || WORD_SETS[0];
@@ -504,7 +676,7 @@
   }
 
   const TURN_SECONDS = 30;
-  const STORAGE_KEY = "in-the-bag-game-v2";
+  const STORAGE_KEY = "in-the-bag-game-v3";
 
   const ROUND_META = [
     null,
@@ -512,12 +684,7 @@
     { label: "One Word Only", rule: "You may give exactly one word as a clue. Nothing more." },
     { label: "Act It Out", rule: "No talking or sounds at all — gestures only." }
   ];
-
   const TIEBREAK_META = { label: "Sudden Death", rule: "One 30-second turn each, Act It Out rules. No skips. Most words guessed wins it all." };
-
-  function currentBag(){
-    return state.mode === "tiebreak" ? state.tie.bag : state.bag;
-  }
 
   function shuffle(arr){
     const a = arr.slice();
@@ -539,7 +706,7 @@
       gameWords: getSetWords(WORD_SETS[0].id),
       round: 1,
       currentTeam: "a",
-      bag: [],              // array of word strings remaining this round, in order
+      bag: [],
       skipsUsed: { a: {1:0,2:0,3:0}, b: {1:0,2:0,3:0} },
       roundScores: { a: {1:0,2:0,3:0}, b: {1:0,2:0,3:0} },
       turnGuesses: 0,
@@ -564,6 +731,81 @@
 
   state = load() || freshState();
 
+  function currentBag(){
+    return state.mode === "tiebreak" ? state.tie.bag : state.bag;
+  }
+  function teamName(t){ return state.names[t]; }
+  function otherTeam(t){ return t === "a" ? "b" : "a"; }
+  function totalFor(team){
+    const s = state.roundScores[team];
+    return (s[1]||0) + (s[2]||0) + (s[3]||0);
+  }
+
+  // ---------------- Audio ----------------
+  let audioCtx = null;
+  function getAudioCtx(){
+    audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+    return audioCtx;
+  }
+  function playTone(freq, type, startOffset, duration, peakGain){
+    try{
+      const ctx = getAudioCtx();
+      const now = ctx.currentTime + startOffset;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = type;
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.exponentialRampToValueAtTime(peakGain, now + Math.min(0.02, duration/3));
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+      osc.connect(gain).connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + duration + 0.02);
+    }catch(e){ /* audio unavailable */ }
+  }
+  function playTick(){
+    playTone(1200, "square", 0, 0.16, 0.42);
+    playTone(1200, "square", 0.18, 0.12, 0.34);
+  }
+  let clockTickToggle = false;
+  function playClockTick(){
+    clockTickToggle = !clockTickToggle;
+    playTone(clockTickToggle ? 1500 : 850, "square", 0, 0.035, 0.16);
+  }
+  function playBuzzer(){
+    for(let i=0;i<4;i++){
+      playTone(i % 2 === 0 ? 220 : 180, "sawtooth", i * 0.22, 0.2, 0.32);
+    }
+  }
+  function playChime(){
+    [880, 1174.66].forEach((freq, i) => {
+      playTone(freq, "sine", i * 0.09, 0.25, 0.3);
+    });
+  }
+  function playBell(){
+    const pulses = 13;
+    for(let i = 0; i < pulses; i++){
+      const t = i * 0.095;
+      playTone(1600, "square", t, 0.09, 0.28);
+      playTone(1900, "square", t, 0.09, 0.16);
+      playTone(800, "sine", t, 0.09, 0.1);
+    }
+  }
+  function vibrateAlert(){
+    try{ if(navigator.vibrate) navigator.vibrate([250,120,250,120,250]); }catch(e){}
+  }
+  function flashAlert(){
+    const el = document.getElementById("flashOverlay");
+    el.classList.remove("flashing");
+    void el.offsetWidth;
+    el.classList.add("flashing");
+  }
+  function fireTimeUpAlert(){
+    playBuzzer();
+    vibrateAlert();
+    flashAlert();
+  }
+
   // ---------------- View switching ----------------
   const views = {};
   ["setup","ready","play","timesup","roundend","gameover"].forEach(id=>{
@@ -574,17 +816,69 @@
     views[name].classList.add("active");
   }
 
+  // ---------------- Menu wiring ----------------
+  const menuOverlay = document.getElementById("menuOverlay");
+  const menuBtn = document.getElementById("menuBtn");
+  const closeMenuBtn = document.getElementById("closeMenuBtn");
+
+  function openMenu(){
+    renderSetGrid();
+    renderAdminScoreEditor();
+    document.getElementById("adminStatus").textContent = "";
+    document.getElementById("adminNameA").value = state.names.a;
+    document.getElementById("adminNameB").value = state.names.b;
+    menuOverlay.classList.add("open");
+  }
+  function closeMenu(){ menuOverlay.classList.remove("open"); }
+
+  menuBtn.addEventListener("click", openMenu);
+  closeMenuBtn.addEventListener("click", closeMenu);
+  menuOverlay.addEventListener("click", (e) => { if(e.target === menuOverlay) closeMenu(); });
+
   // ---------------- Setup view wiring ----------------
   const nameAInput = document.getElementById("nameA");
   const nameBInput = document.getElementById("nameB");
   const setGrid = document.getElementById("setGrid");
   const startGameBtn = document.getElementById("startGameBtn");
+  const currentSetEmoji = document.getElementById("currentSetEmoji");
+  const currentSetName = document.getElementById("currentSetName");
+  const changeSetBtn = document.getElementById("changeSetBtn");
 
   nameAInput.value = state.names.a;
   nameBInput.value = state.names.b;
 
-  nameAInput.addEventListener("input", e => { state.names.a = e.target.value.trim() || "Team A"; save(); });
-  nameBInput.addEventListener("input", e => { state.names.b = e.target.value.trim() || "Team B"; save(); });
+  nameAInput.addEventListener("input", e => {
+    state.names.a = e.target.value.slice(0,20).trim() || "Team A";
+    save();
+    adminNameA.value = e.target.value.slice(0,20);
+  });
+  nameBInput.addEventListener("input", e => {
+    state.names.b = e.target.value.slice(0,20).trim() || "Team B";
+    save();
+    adminNameB.value = e.target.value.slice(0,20);
+  });
+
+  const adminNameA = document.getElementById("adminNameA");
+  const adminNameB = document.getElementById("adminNameB");
+
+  adminNameA.addEventListener("input", e => {
+    state.names.a = e.target.value.slice(0,20).trim() || "Team A";
+    save();
+    nameAInput.value = e.target.value.slice(0,20);
+  });
+  adminNameB.addEventListener("input", e => {
+    state.names.b = e.target.value.slice(0,20).trim() || "Team B";
+    save();
+    nameBInput.value = e.target.value.slice(0,20);
+  });
+
+  changeSetBtn.addEventListener("click", openMenu);
+
+  function updateCurrentSetCard(){
+    const set = getSetById(state.setId);
+    currentSetEmoji.textContent = set.emoji;
+    currentSetName.textContent = set.name;
+  }
 
   function renderSetGrid(){
     setGrid.innerHTML = "";
@@ -603,15 +897,14 @@
         state.gameWords = getSetWords(set.id);
         save();
         renderSetGrid();
+        updateCurrentSetCard();
       });
       setGrid.appendChild(btn);
     });
   }
-  renderSetGrid();
+  updateCurrentSetCard();
 
-  startGameBtn.addEventListener("click", () => {
-    startNewGame();
-  });
+  startGameBtn.addEventListener("click", () => { startNewGame(); });
 
   function startNewGame(){
     const names = state.names;
@@ -624,10 +917,74 @@
     save();
   }
 
-  function goToSetPicker(){
-    renderSetGrid();
-    showView("setup");
+  function goToSetPicker(){ openMenu(); showView("setup"); }
+
+  // ---------------- Admin score editor ----------------
+  const adminScoreEditor = document.getElementById("adminScoreEditor");
+  const saveScoresBtn = document.getElementById("saveScoresBtn");
+  const resetScoresBtn = document.getElementById("resetScoresBtn");
+  const adminStatus = document.getElementById("adminStatus");
+
+  function renderAdminScoreEditor(){
+    const hasTie = state.mode === "tiebreak";
+    let cols = ["R1","R2","R3"];
+    if(hasTie) cols.push("SD");
+    let html = `<div class="admin-score-grid"><div class="admin-head"></div>`;
+    cols.forEach(c => html += `<div class="admin-head">${c}</div>`);
+    html += `</div>`;
+    ["a","b"].forEach(t => {
+      html += `<div class="admin-score-grid">`;
+      html += `<div class="admin-team-label" style="color:${t === "a" ? "var(--team-a)" : "var(--team-b)"}">${teamName(t)}</div>`;
+      html += `<input type="number" min="0" inputmode="numeric" id="admin-${t}-1" value="${state.roundScores[t][1]||0}">`;
+      html += `<input type="number" min="0" inputmode="numeric" id="admin-${t}-2" value="${state.roundScores[t][2]||0}">`;
+      html += `<input type="number" min="0" inputmode="numeric" id="admin-${t}-3" value="${state.roundScores[t][3]||0}">`;
+      if(hasTie){
+        html += `<input type="number" min="0" inputmode="numeric" id="admin-${t}-tie" value="${state.tie.scores[t]||0}">`;
+      }
+      html += `</div>`;
+    });
+    adminScoreEditor.innerHTML = html;
   }
+
+  saveScoresBtn.addEventListener("click", () => {
+    ["a","b"].forEach(t => {
+      [1,2,3].forEach(r => {
+        const el = document.getElementById(`admin-${t}-${r}`);
+        if(el){
+          const val = Math.max(0, parseInt(el.value, 10) || 0);
+          state.roundScores[t][r] = val;
+        }
+      });
+      if(state.mode === "tiebreak"){
+        const tieEl = document.getElementById(`admin-${t}-tie`);
+        if(tieEl){
+          state.tie.scores[t] = Math.max(0, parseInt(tieEl.value, 10) || 0);
+        }
+      }
+    });
+    save();
+    adminStatus.textContent = "Saved ✓";
+    setTimeout(() => { adminStatus.textContent = ""; }, 2000);
+  });
+
+  resetScoresBtn.addEventListener("click", () => {
+    const ok = confirm("Reset all scores to zero and return to the start screen? This can't be undone.");
+    if(!ok) return;
+    stopTimer();
+    const names = state.names;
+    const setId = state.setId;
+    state = freshState();
+    state.names = names;
+    state.setId = setId;
+    state.gameWords = getSetWords(setId);
+    save();
+    closeMenu();
+    nameAInput.value = state.names.a;
+    nameBInput.value = state.names.b;
+    updateCurrentSetCard();
+    showView("setup");
+    adminStatus.textContent = "";
+  });
 
   // ---------------- Round / turn setup ----------------
   function startingTeamForRound(round){
@@ -645,9 +1002,6 @@
     save();
     showReady();
   }
-
-  function teamName(t){ return state.names[t]; }
-  function otherTeam(t){ return t === "a" ? "b" : "a"; }
 
   // ---------------- READY view ----------------
   const readyRoundPill = document.getElementById("readyRoundPill");
@@ -685,6 +1039,7 @@
   }
 
   startTurnBtn.addEventListener("click", () => {
+    playBell();
     state.timeLeft = TURN_SECONDS;
     state.turnGuesses = 0;
     showPlay();
@@ -732,7 +1087,6 @@
   function updateWordCard(){
     const bag = currentBag();
     if(bag.length === 0){ wordText.textContent = "—"; return; }
-    wordCard.classList.remove("hidden-word");
     wordText.textContent = bag[0];
   }
 
@@ -765,6 +1119,11 @@
     timerInterval = setInterval(() => {
       state.timeLeft -= 1;
       updateTimerDisplay();
+      if(state.timeLeft > 5){
+        playClockTick();
+      } else if(state.timeLeft > 0){
+        playTick();
+      }
       if(state.timeLeft <= 0){
         clearInterval(timerInterval);
         state.timerRunning = false;
@@ -796,6 +1155,7 @@
     const bag = currentBag();
     if(bag.length === 0) return;
     bag.shift();
+    playChime();
     if(state.mode === "tiebreak"){
       state.tie.scores[state.currentTeam] += 1;
     } else {
@@ -818,7 +1178,7 @@
   });
 
   skipBtn.addEventListener("click", () => {
-    if(state.mode === "tiebreak") return; // no skips in sudden death
+    if(state.mode === "tiebreak") return;
     const skipsLeft = 1 - state.skipsUsed[state.currentTeam][state.round];
     if(skipsLeft <= 0 || state.bag.length === 0) return;
     state.skipsUsed[state.currentTeam][state.round] += 1;
@@ -829,42 +1189,7 @@
     save();
   });
 
-  // ---------------- Alerts ----------------
-  let audioCtx = null;
-  function playBeep(){
-    try{
-      audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
-      const now = audioCtx.currentTime;
-      for(let i=0;i<3;i++){
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.type = "square";
-        osc.frequency.value = 880;
-        gain.gain.setValueAtTime(0.0001, now + i*0.35);
-        gain.gain.exponentialRampToValueAtTime(0.35, now + i*0.35 + 0.02);
-        gain.gain.exponentialRampToValueAtTime(0.0001, now + i*0.35 + 0.28);
-        osc.connect(gain).connect(audioCtx.destination);
-        osc.start(now + i*0.35);
-        osc.stop(now + i*0.35 + 0.3);
-      }
-    }catch(e){ /* audio unavailable */ }
-  }
-  function vibrateAlert(){
-    try{ if(navigator.vibrate) navigator.vibrate([250,120,250,120,250]); }catch(e){}
-  }
-  function flashAlert(){
-    const el = document.getElementById("flashOverlay");
-    el.classList.remove("flashing");
-    void el.offsetWidth; // restart animation
-    el.classList.add("flashing");
-  }
-  function fireTimeUpAlert(){
-    playBeep();
-    vibrateAlert();
-    flashAlert();
-  }
-
-  // ---------------- Time's up view ----------------
+  // ---------------- Time's up / tiebreak turn end ----------------
   const timesupTally = document.getElementById("timesupTally");
   const timesupScores = document.getElementById("timesupScores");
   const continueAfterTimesupBtn = document.getElementById("continueAfterTimesupBtn");
@@ -936,11 +1261,7 @@
     roundendHeadline.textContent = `Round ${state.round} Complete!`;
     renderScoreTable(roundendScores, state.round);
     save();
-    if(state.round >= 3){
-      nextRoundBtn.textContent = "See Final Results";
-    } else {
-      nextRoundBtn.textContent = `Start Round ${state.round + 1}`;
-    }
+    nextRoundBtn.textContent = state.round >= 3 ? "See Final Results" : `Start Round ${state.round + 1}`;
     showView("roundend");
   }
 
@@ -971,11 +1292,6 @@
   const finalScores = document.getElementById("finalScores");
   const playAgainBtn = document.getElementById("playAgainBtn");
   const newWordsBtn = document.getElementById("newWordsBtn");
-
-  function totalFor(team){
-    const s = state.roundScores[team];
-    return (s[1]||0) + (s[2]||0) + (s[3]||0);
-  }
 
   function showGameOver(){
     const totalA = totalFor("a");
@@ -1019,7 +1335,7 @@
 
   function renderFinalBreakdownTable(container){
     const hadTiebreak = state.mode === "tiebreak";
-    let head = `<tr><th class="team-cell-h" style="text-align:left;">Team</th><th>R1</th><th>R2</th><th>R3</th>${hadTiebreak ? "<th>SD</th>" : ""}<th>Total</th></tr>`;
+    let head = `<tr><th style="text-align:left;">Team</th><th>R1</th><th>R2</th><th>R3</th>${hadTiebreak ? "<th>SD</th>" : ""}<th>Total</th></tr>`;
     let rows = "";
     ["a","b"].forEach(t => {
       const s = state.roundScores[t];
@@ -1035,11 +1351,10 @@
   }
 
   // ---------------- Resume mid-game if reloaded ----------------
-  // If a game was already in progress (bag has been dealt), jump back into it at the ready screen
-  // rather than the setup screen, so an accidental refresh doesn't lose the game.
   if(state.bag && state.bag.length && state.bag.length !== state.gameWords.length){
     nameAInput.value = state.names.a;
     nameBInput.value = state.names.b;
+    updateCurrentSetCard();
     showReady();
   }
 
