@@ -1184,6 +1184,14 @@ import { getDatabase, ref, set, update, onValue } from "https://www.gstatic.com/
     }).catch(function(){});
     subscribeAsController(roomCode);
     showControllerApp();
+    if(state.bag && state.bag.length && state.bag.length !== state.gameWords.length){
+      showReady();
+    } else {
+      nameAInput.value = state.names.a;
+      nameBInput.value = state.names.b;
+      updateCurrentSetCard();
+      showView("setup");
+    }
   }
 
   function becomeDisplay(roomCode){
